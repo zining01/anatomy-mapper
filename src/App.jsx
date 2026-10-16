@@ -226,7 +226,7 @@ export default function App() {
           <h1 style={{ fontSize: 25, margin: 0, fontWeight: 700 }}>Anatomy Region Mapper</h1>
           <p style={{ margin: "4px 0 0", color: "#7a6a5c", fontSize: 14 }}>
             Click a region or dot to select it. Facial cosmetic subunits follow the Gonzalez-Ulloa aesthetic units with Burget &amp; Menick nasal
-            subunits; dermatomes follow the ISNCSCI (ASIA) key sensory points.
+            subunits.
           </p>
         </header>
 
@@ -366,8 +366,7 @@ export default function App() {
               </button>
             </div>
             <p style={{ fontSize: 11, color: "#a3917f", marginTop: 12, lineHeight: 1.5 }}>
-              Teaching / reference aid. Artwork is a schematic; subunit boundaries are drawn at their conventional positions and dermatomes vary
-              between individuals and published maps. Verify site and laterality against the patient before documenting.
+              Note: dermatomes may vary between individuals and published maps.
             </p>
           </div>
         </div>

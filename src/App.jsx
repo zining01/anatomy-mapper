@@ -162,7 +162,9 @@ export default function App() {
     }
   };
 
-  // What the reference card shows: the item under the pointer, else the last one clicked.
+  // The reference card shows the last item clicked. Hovering only names the item above the
+  // figure and highlights it: letting hover drive the card made the page reflow under the
+  // pointer, which changed what was hovered and made the card flicker.
   const hoverFocus = (() => {
     if (!hovered) return null;
     if (hovered.startsWith("s:")) {
@@ -172,7 +174,7 @@ export default function App() {
     return byId[hovered] && !byId[hovered].navigate ? { kind: "region", region: byId[hovered] } : null;
   })();
   const pinnedFocus = !active ? null : active.kind === "region" ? byId[active.id] && { kind: "region", region: byId[active.id] } : active;
-  const focus = hoverFocus || pinnedFocus;
+  const focus = pinnedFocus;
   const hoverName = !hovered ? null : hoverFocus ? (hoverFocus.kind === "region" ? hoverFocus.region.name : structureName(hoverFocus.id, hoverFocus.sideKey)) : byId[hovered]?.name;
 
   const sameStructure = (it, f) => f && f.kind === "structure" && f.id === it.id && (!f.sideKey || !it.sideKey || f.sideKey === it.sideKey);
@@ -616,7 +618,7 @@ export default function App() {
               </button>
             </div>
 
-            <InfoPanel focus={focus} pinned={!hoverFocus && !!pinnedFocus} viewStructures={viewStructures} onPickStructure={pickStructure} onClear={() => setActive(null)} />
+            <InfoPanel focus={focus} pinned={!!pinnedFocus} viewStructures={viewStructures} onPickStructure={pickStructure} onClear={() => setActive(null)} />
 
             <p style={{ fontSize: 11, color: "#a3917f", marginTop: 12, lineHeight: 1.5 }}>
               A reference aid for trained clinicians, not a substitute for clinical judgement. Nerve and vessel courses are schematic adult averages

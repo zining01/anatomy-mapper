@@ -2,7 +2,8 @@
 // patient's LEFT side when seen from behind, then mirrored about x = 150.
 import { spline, seg, chain, rev, mirror, midline, pathD, labelPointOnLine } from "../geometry.js";
 import { C } from "./common.js";
-import { headRegion, headPair, LEFT } from "./catalog.js";
+import { headRegion, headPair, LEFT, RIGHT } from "./catalog.js";
+import { line, zone, point, rstl, placeOverlays } from "./overlay.js";
 
 const CX = 150;
 const sp = (pts) => spline(pts, { steps: 8 });
@@ -46,6 +47,22 @@ const regions = [
   ...Object.entries(SIDED).flatMap(([id, pts]) => headPair(id, pts, CX, LEFT)),
 ];
 
+// Surgical anatomy, authored on the patient's left (viewer's left). The external occipital
+// protuberance is at about [150, 200]; the mastoid tip is MAS.
+const GON = [126, 201];
+const ANATOMY = [
+  zone("xi-accessory", [[92, 244], [102, 252], [104, 276], [96, 300], [78, 318], [68, 315], [84, 296], [92, 270]], [98, 274]),
+  line("xi-accessory", "motor", [[97, 249], [98, 270], [92, 292], [80, 310]]),
+  line("c-greater-occipital", "sensory", [GON, [122, 170], [118, 135], [120, 100], [128, 70]]),
+  point("c-greater-occipital", "sensory", GON),
+  line("c-lesser-occipital", "sensory", [[98, 240], [92, 214], [88, 188], [86, 160]]),
+  line("c-great-auricular", "sensory", [[99, 262], [90, 238], [78, 216], [64, 203]]),
+  line("a-occipital", "vessels", [[116, 204], [110, 172], [105.5, 138], [107, 104], [114, 76]]),
+  line("a-posterior-auricular", "vessels", [[72, 210], [63, 192], [60.5, 168], [63, 150]]),
+  ...rstl([[112, 262], [130, 265], [150, 266]], [[106, 300], [128, 304], [150, 305]], [[98, 336], [126, 341], [150, 342]]),
+];
+const overlays = [...placeOverlays(ANATOMY, LEFT), ...placeOverlays(ANATOMY, RIGHT, (pts) => mirror(pts, CX))];
+
 const both = (pts) => [pts, mirror(pts, CX)];
 const HEAD = midline(chain(OUT, [CORNER]), CX);
 const STRANDS = [
@@ -87,4 +104,5 @@ export default {
   Under,
   Over,
   regions,
+  overlays,
 };

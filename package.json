@@ -1,8 +1,8 @@
 {
   "name": "anatomy-mapper",
-  "version": "4.0.0",
+  "version": "5.0.0",
   "private": true,
-  "description": "Clickable anatomy region, cosmetic subunit and dermatome mapper for clinical documentation.",
+  "description": "Clickable anatomy region, cosmetic subunit, surgical danger-zone and dermatome mapper for dermatologic surgery.",
   "type": "module",
   "scripts": {
     "build": "node build.mjs",

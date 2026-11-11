@@ -1,8 +1,12 @@
 # anatomy-mapper
 
-A click-to-select anatomy map for clinical documentation. Pick regions on the
-figure and copy a note snippet such as
-`Right nasal ala; Left melolabial (nasolabial) fold; Right T10 dermatome`.
+A click-to-select anatomy map for clinical documentation and a surgical-anatomy
+reference for dermatologic and Mohs surgery. Pick regions on the figure and copy
+a note snippet such as
+`Right nasal ala; Left melolabial (nasolabial) fold; Right T10 dermatome`
+(optionally with the Mohs AUC area appended). Clicking a region also shows its
+danger structures, undermining plane, nerve and blood supply, lymphatic
+drainage and common repair options.
 
 Open `index.html` in a browser — it is fully self-contained (no server or
 internet connection needed), so it also works as a GitHub Pages site.
@@ -11,15 +15,42 @@ internet connection needed), so it also works as a GitHub Pages site.
 
 | Group | Views | Content |
 | --- | --- | --- |
-| Whole body | Anterior, Posterior | ~100 body sites (dots) |
-| Head & neck | Face, Right/Left lateral, Posterior | Facial aesthetic units & subunits (Gonzalez-Ulloa units, Burget & Menick nasal subunits), scalp, ear, neck |
+| Whole body | Anterior, Posterior | ~110 body sites (dots) and danger points (ulnar nerve at the elbow, common peroneal nerve, Erb's point …) |
+| Head & neck | Face, Right/Left lateral, Posterior | Facial aesthetic units & subunits (Gonzalez-Ulloa units, Burget & Menick nasal subunits incl. root, supratip, infratip, nostril sill), scalp, ear, neck triangles |
+| | Nasal base | Worm's-eye view: infratip lobule, soft triangles, columella, alar rims, nostril sills |
 | | Right ear, Left ear | Auricular subunits: helix, helical root, scapha, antihelix & crura, triangular fossa, cymba & cavum conchae, canal, tragus, antitragus, lobule, pre/postauricular skin |
+| Hands & feet | Hands dorsal/palmar, Feet dorsal/plantar | Every digit by phalanx, nail units, palm and sole areas, wrist and ankle |
+| | Nail unit | Labelled dorsal view and sagittal section (folds, cuticle, matrix, bed, plate, hyponychium, phalanx, extensor insertion, DIP joint) with surgical notes for each part |
 | Dermatomes | Anterior, Posterior | V1–V3, C2–S5 per the ISNCSCI (ASIA) chart, with key sensory points |
 
 A subunit that appears in several views (e.g. the right nasal ala on the face
 and right lateral views) is the same region, so selecting it in one view shows
 it selected in the others. Double-click an ear on a head view to open the
 detailed ear.
+
+## Surgical anatomy
+
+* **Anatomy layers** (chips above the figure; the choice is remembered):
+  danger zones, motor and mixed nerves (facial nerve branches, spinal
+  accessory nerve, and the major nerves of the limbs), sensory / cutaneous
+  nerves with their foramina and block points, arteries and superficial
+  veins, parotid and ducts, and relaxed skin tension lines. The layers are
+  available on the head, whole-body, hand and foot views. Facial danger zones follow Seckel's
+  seven zones plus Erb's point.
+* **Click a nerve, vessel or `!` marker** for its surface landmarks, depth,
+  what happens if it is injured and how to avoid it. Structures can also be
+  found from the search box (e.g. "Erb", "Pitanguy", "Stensen").
+* **Click a region** for its reference card. The "structures at risk" chips
+  switch on the right layer and highlight the structure on the figure.
+* **Zoom** presets (eyes, nose, lips, temple, neck on the head views; trunk,
+  arms, thighs, legs on the body views) make small subunits and crowded
+  limbs easy to read.
+* Deep links: `index.html#view=headRight&layers=danger,motor&zoom=1&focus=fa-temple-r`.
+
+The reference text is a memory aid for trained clinicians: nerve and vessel
+courses are schematic adult averages, and the notes are not treatment
+recommendations. **Review the content in `src/reference/` against your own
+sources before relying on it.**
 
 ## Editing
 
@@ -28,7 +59,7 @@ The editable source is in `src/`; `index.html` is generated from it.
 ```sh
 npm install      # once
 npm run dev      # rebuilds index.html whenever a file in src/ changes
-npm run build    # one-off build
+npm run build    # one-off build  (or: node build.mjs)
 ```
 
 Then refresh `index.html` in the browser. You can deep-link to a view with
@@ -37,18 +68,26 @@ Then refresh `index.html` in the browser. You can deep-link to a view with
 ```
 src/
   main.jsx              entry point
-  App.jsx               UI: view buttons, figure rendering, search, selection, snippet
+  App.jsx               UI: view buttons, figure rendering, overlays, search, selection, snippet
+  InfoPanel.jsx         the "Surgical reference" card
+  reference/
+    structures.js       text for every nerve, vessel, duct and danger zone
+    regions.js          per-region notes: AUC area, structures at risk, plane, supply, lymphatics, repair
   geometry.js           spline / region-building helpers shared by all drawings
   views/
     index.js            which views exist and how the buttons are grouped
-    common.js           colours, subunit groups (legend), left/right naming
+    common.js           colours, subunit groups (legend), overlay layers, left/right naming
+    overlay.js          helpers for drawing nerves, vessels and danger zones
     catalog.js          names + search aliases for every head & neck region
     faceAnterior.jsx    face, anterior
     headLateral.jsx     head, right lateral (left lateral is its mirror)
     headPosterior.jsx   head, posterior
     ear.jsx             ear subunits (left ear is the mirror of the right)
     bodyFigure.jsx      shared whole-body drawing and limb coordinate frames
-    bodyViews.jsx       body-site dots (anterior & posterior)
+    bodyViews.jsx       body-site dots and danger points (anterior & posterior)
+    handsFeet.jsx       hands and feet, built digit by digit
+    noseBase.jsx        nasal base (worm's-eye view)
+    nailUnit.jsx        nail unit: dorsal view and sagittal section
     dermatomes.jsx      dermatome maps
 ```
 
@@ -79,3 +118,10 @@ src/
   name and placed on the viewer's left.
 * **Add a head subunit:** add it to `catalog.js`, then add its shape to the
   view(s) where it is visible, keyed by the same id.
+* **Edit the surgical notes:** region notes are in `reference/regions.js`
+  (keyed by region id without the `-r` / `-l` suffix; `like:` inherits from
+  another entry), structure notes in `reference/structures.js`.
+* **Move or add a nerve / vessel / danger zone:** edit the `ANATOMY` list in
+  the view (`line`, `zone`, `area`, `point` from `overlay.js`). Lines are
+  smooth curves through the listed points, authored on one side and mirrored.
+  A new structure id needs a matching entry in `reference/structures.js`.

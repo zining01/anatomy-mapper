@@ -4,6 +4,7 @@
 import { spline, seg, chain, rev, mirror, pathD, frame } from "../geometry.js";
 import { C } from "./common.js";
 import { headRegion, RIGHT, LEFT } from "./catalog.js";
+import { line, area, point, placeOverlays } from "./overlay.js";
 
 const CX = 150;
 const sp = (pts) => spline(pts, { steps: 10 });
@@ -88,9 +89,24 @@ const SHADING = [
   S(r(160, 150), r(150, 176), r(152, 206), r(166, 226)), // depth of the cavum
 ];
 
+// Structures around the ear (view coordinates, right ear). The tragus is at about [214, 181],
+// the lobule attachment at [204, 279].
+const ANATOMY = [
+  area("parotid", "glands", [[218, 150], [258, 158], [268, 226], [252, 296], [226, 330], [208, 304], [212, 262], [219, 232], [222, 190]]),
+  line("vii-trunk", "motor", [[204, 268], [214, 262], [226, 258]]),
+  point("vii-trunk", "motor", [214, 262]),
+  line("a-sta", "vessels", [[229, 246], [230, 200], [224, 152], [215, 112], [213, 70]]),
+  line("v3-auriculotemporal", "sensory", [[222, 240], [223, 200], [216, 152], [206, 110], [203, 70]]),
+  line("c-great-auricular", "sensory", [[197, 376], [191, 350], [185, 329]]),
+  line("c-great-auricular", "sensory", [[178, 376], [152, 353], [129, 331], [112, 300]]),
+  line("c-lesser-occipital", "sensory", [[72, 356], [53, 302], [45, 242], [47, 182]]),
+  line("a-posterior-auricular", "vessels", [[98, 334], [73, 282], [59, 222], [57, 162], [67, 112]]),
+];
+
 function build(side) {
   const flip = side === LEFT;
   const place = (pts) => (flip ? rev(mirror(pts, CX)) : pts);
+  const overlays = placeOverlays(ANATOMY, side, (pts) => (flip ? mirror(pts, CX) : pts));
   const regions = Object.entries(SHAPES).map(([id, pts]) =>
     headRegion(id, place(pts), side, id.startsWith("ear-") ? {} : { group: "periauricular" })
   );
@@ -123,6 +139,7 @@ function build(side) {
     Under,
     Over,
     regions,
+    overlays,
     note: "The posterior auricle is on the posterior head view.",
   };
 }

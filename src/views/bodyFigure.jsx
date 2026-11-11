@@ -149,20 +149,20 @@ function Details({ posterior, bare = false }) {
 }
 
 /** Skin-coloured silhouette with a single clean outline (outline drawn first, fill on top). */
-export function Silhouette({ posterior, fill = C.skin }) {
+export function Silhouette({ posterior, fill = C.skin, k = 1 }) {
   const list = parts(posterior);
   return (
     <g>
-      {list.map((p, i) => <path key={"o" + i} d={pathD(p)} fill={C.line} stroke={C.line} strokeWidth="3" strokeLinejoin="round" />)}
+      {list.map((p, i) => <path key={"o" + i} d={pathD(p)} fill={C.line} stroke={C.line} strokeWidth={3 * k} strokeLinejoin="round" />)}
       {list.map((p, i) => <path key={"f" + i} d={pathD(p)} fill={fill} />)}
     </g>
   );
 }
 
-export function BodyArt({ posterior }) {
+export function BodyArt({ posterior, k = 1 }) {
   return (
     <g>
-      <Silhouette posterior={posterior} />
+      <Silhouette posterior={posterior} k={k} />
       <Details posterior={posterior} />
     </g>
   );

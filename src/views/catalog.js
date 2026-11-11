@@ -30,10 +30,14 @@ export const CATALOG = {
   "fa-lateral-canthus": { name: "{Side} lateral canthus", aliases: ["{side} outer corner of eye", "{side} crow's feet"], group: "eye" },
 
   // Nose (Burget & Menick subunits)
-  "fa-nasal-dorsum": { name: "Nasal dorsum", aliases: ["nose bridge", "dorsum", "radix", "nasal root"], group: "nose" },
+  "fa-nasal-root": { name: "Nasal root (radix)", aliases: ["radix", "nasion", "root of nose"], group: "nose" },
+  "fa-nasal-dorsum": { name: "Nasal dorsum", aliases: ["nose bridge", "dorsum", "rhinion"], group: "nose" },
   "fa-nasal-sidewall": { name: "{Side} nasal sidewall", aliases: ["{side} side of nose"], group: "nose" },
-  "fa-nasal-tip": { name: "Nasal tip", aliases: ["tip of nose", "supratip", "infratip lobule"], group: "nose" },
-  "fa-nasal-ala": { name: "{Side} nasal ala", aliases: ["{side} ala", "{side} nostril", "{side} alar"], group: "nose" },
+  "fa-nasal-supratip": { name: "Nasal supratip", aliases: ["supratip", "supratip break"], group: "nose" },
+  "fa-nasal-tip": { name: "Nasal tip", aliases: ["tip of nose", "tip lobule", "pronasale"], group: "nose" },
+  "fa-nasal-infratip": { name: "Nasal infratip lobule", aliases: ["infratip", "infratip lobule"], group: "nose" },
+  "fa-nasal-ala": { name: "{Side} nasal ala", aliases: ["{side} ala", "{side} alar", "{side} alar crease", "{side} alar groove", "{side} alar rim"], group: "nose" },
+  "fa-nasal-vestibule": { name: "{Side} nostril sill / nasal vestibule", aliases: ["{side} nostril", "{side} nasal sill", "{side} vestibule", "{side} naris"], group: "nose", base: "nostril" },
   "fa-soft-triangle": { name: "{Side} soft triangle", aliases: ["{side} soft tissue facet"], group: "nose" },
   "fa-columella": { name: "Columella", aliases: ["nasal columella"], group: "nose" },
 
@@ -77,7 +81,9 @@ export const CATALOG = {
 
   // Neck
   "fa-anterior-neck": { name: "Anterior neck", aliases: ["throat", "front of neck"], group: "neck", base: "skinShade" },
-  "fa-lateral-neck": { name: "{Side} lateral neck", aliases: ["{side} side of neck", "{side} sternocleidomastoid"], group: "neck", base: "skinShade" },
+  "h-submandibular": { name: "{Side} submandibular neck", aliases: ["{side} submandibular triangle", "{side} under the jaw", "{side} upper neck"], group: "neck", base: "skinShade" },
+  "h-scm": { name: "{Side} lateral neck (sternocleidomastoid)", aliases: ["{side} side of neck", "{side} sternocleidomastoid", "{side} scm", "{side} lateral neck"], group: "neck", base: "skinShade" },
+  "h-posterior-triangle": { name: "{Side} posterior triangle of neck", aliases: ["{side} posterior triangle", "{side} lateral neck", "{side} erb's point", "{side} supraclavicular"], group: "neck", base: "skinShade" },
   "h-posterolateral-neck": { name: "{Side} posterolateral neck", aliases: ["{side} back of neck", "{side} trapezius"], group: "neck", base: "skinShade" },
   "h-nuchal": { name: "Posterior neck (nuchal)", aliases: ["nape", "back of neck", "nuchal"], group: "neck", base: "skinShade" },
 };

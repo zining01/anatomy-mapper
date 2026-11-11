@@ -37,6 +37,24 @@ export const GROUPS = {
   periauricular: { label: "Periauricular skin", color: "#8b6a4c" },
   neck: { label: "Neck", color: "#8b6a4c" },
   body: { label: "Body site", color: "#3d6b8a" },
+  digit: { label: "Digits", color: "#3d6b8a" },
+  nail: { label: "Nail unit", color: "#a23e6b" },
+  palm: { label: "Hand / foot", color: "#b7832a" },
+  joint: { label: "Wrist / ankle", color: "#6f7d2a" },
+  nailfold: { label: "Nail folds", color: "#b7832a" },
+  nailmatrix: { label: "Matrix", color: "#a23e6b" },
+  nailbed: { label: "Nail bed / plate", color: "#c0562e" },
+  deep: { label: "Bone / tendon / joint", color: "#3d6b8a" },
+};
+
+// Surgical-anatomy overlay layers (toggle chips above the figure).
+export const LAYERS = {
+  danger: { label: "Danger zones", color: "#d21f3c", on: true },
+  motor: { label: "Motor & mixed nerves", color: "#e0a400", on: true },
+  sensory: { label: "Sensory nerves", color: "#6a45c2" },
+  vessels: { label: "Vessels", color: "#cf2e2e" },
+  glands: { label: "Parotid & ducts", color: "#7d8f1a" },
+  rstl: { label: "Skin tension lines", color: "#4f7396" },
 };
 
 // ---------------------------------------------------------------------------
@@ -62,6 +80,8 @@ export const sided = (text, s) => (s ? text.replace(/\{Side\}/g, s.Side).replace
 export function region({ id, name, aliases = [], group, pts, dot, base, link, navigate, side }) {
   return {
     id: side ? `${id}-${side.key}` : id,
+    baseId: id,
+    sideKey: side ? side.key : null,
     name: sided(name, side),
     aliases: aliases.map((a) => sided(a, side).toLowerCase()),
     group,

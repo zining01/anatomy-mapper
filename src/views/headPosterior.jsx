@@ -4,6 +4,7 @@ import { spline, seg, chain, rev, mirror, midline, pathD, labelPointOnLine } fro
 import { C } from "./common.js";
 import { headRegion, headPair, LEFT, RIGHT } from "./catalog.js";
 import { line, zone, point, rstl, placeOverlays } from "./overlay.js";
+import { Shade, ell, blob, streak, strands, LIGHT } from "./shading.jsx";
 
 const CX = 150;
 const sp = (pts) => spline(pts, { steps: 8 });
@@ -72,11 +73,26 @@ const STRANDS = [
   sp([[150, 30], [124, 40], [104, 60]]),
 ];
 
+const ptsOf = (...ids) => regions.filter((r) => ids.includes(r.baseId)).map((r) => r.pts);
+const sym = (items) => items.flatMap((it) => [it, { ...it, pts: mirror(it.pts, CX) }]);
+const HAIR_SHADING = [
+  ...strands([150, -60], 50, 130, 2.5, 320, 4).map((p) => streak(spline(p), 0.6, 0.45, 0.3, "#b79c80")),
+  streak(midline(NAPE, CX), 10, 0.3, 4, "#a88a6c"), blob(ell(150, 96, 60, 22), 0.3, 10, LIGHT),
+];
+const NECK_SHADING = [
+  streak([[150, 236], [150, 300], [150, 356]], 6, 0.24, 3),
+  ...sym([streak([[132, 250], [128, 300], [118, 350]], 14, 0.3, 7, LIGHT), streak(NL, 4, 0.12, 3), streak([[96, 240], [100, 272], [92, 300], [62, 326]], 8, 0.2, 4)]),
+  streak(midline(NAPE, CX), 14, 0.2, 5),
+];
+
 function Under() {
   return (
     <g>
       <path d={pathD(HEAD)} fill={C.skinShade} stroke={C.line} strokeWidth="2" strokeLinejoin="round" />
       {regions.map((r) => r.base && <path key={r.id} d={r.d} fill={r.base} />)}
+      <Shade id="hp-neck" clip={ptsOf("h-nuchal", "h-posterolateral-neck")} items={NECK_SHADING} edge={0} />
+      <Shade id="hp-hair" clip={ptsOf("h-vertex-scalp", "h-occipital-scalp", "h-parietal-scalp")} items={HAIR_SHADING} edge={0} />
+      <Shade id="hp-all" clip={[HEAD, ...ptsOf("h-posterior-auricle")]} depth={7} />
     </g>
   );
 }

@@ -4,6 +4,7 @@ import { C, GROUPS, LAYERS } from "./views/common.js";
 import { STRUCTURES } from "./reference/structures.js";
 import { AUC, infoFor } from "./reference/regions.js";
 import InfoPanel, { structureName } from "./InfoPanel.jsx";
+import { GLOSSARY } from "./reference/glossary.js";
 
 const ACCENT = "#e4572e";
 const BROWN = "#8a5a3c";
@@ -115,7 +116,8 @@ export default function App() {
     const structures = Object.entries(STRUCTURES)
       .filter(([id, s]) => structureViews[id] && (s.name.toLowerCase().includes(q) || (q.length > 2 && (s.landmark || "").toLowerCase().includes(q))))
       .map(([id, s]) => ({ id, name: s.name, structure: true, viewLabel: LAYERS[s.layer].label }));
-    return [...regions.slice(0, 10), ...structures.slice(0, 6)];
+    const terms = GLOSSARY.filter((g) => [g.term, ...(g.also || [])].some((f) => f.toLowerCase().includes(q))).map((g) => ({ id: g.term, name: g.term, term: true, viewLabel: "Glossary" }));
+    return [...regions.slice(0, 10), ...structures.slice(0, 6), ...terms.slice(0, 5)];
   }, [query, allRegions, structureViews]);
 
   const isSelected = (id) => selected.some((s) => s.id === id);
@@ -551,9 +553,10 @@ export default function App() {
               <div style={{ border: "1px solid #e6ddd3", borderRadius: 8, overflow: "hidden", marginBottom: 12 }}>
                 {matches.map((m) => (
                   <div
-                    key={(m.structure ? "s:" : "") + m.id}
+                    key={(m.structure ? "s:" : m.term ? "t:" : "") + m.id}
                     onClick={() => {
-                      if (m.structure) pickStructure(m.id, null);
+                      if (m.term) setActive({ kind: "term", term: m.id });
+                      else if (m.structure) pickStructure(m.id, null);
                       else {
                         openView(m.view);
                         if (!isSelected(m.id)) toggle(m);

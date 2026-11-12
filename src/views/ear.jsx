@@ -5,6 +5,7 @@ import { spline, seg, chain, rev, mirror, pathD, frame } from "../geometry.js";
 import { C } from "./common.js";
 import { headRegion, RIGHT, LEFT } from "./catalog.js";
 import { line, area, point, placeOverlays } from "./overlay.js";
+import { Shade, blob, streak, LIGHT } from "./shading.jsx";
 
 const CX = 150;
 const sp = (pts) => spline(pts, { steps: 10 });
@@ -103,6 +104,13 @@ const ANATOMY = [
   line("a-posterior-auricular", "vessels", [[98, 334], [73, 282], [59, 222], [57, 162], [67, 112]]),
 ];
 
+const EAR_SHADING = [
+  blob(SHAPES["ear-cavum"], 0.3, 6), blob(SHAPES["ear-cymba"], 0.24, 5), blob(SHAPES["ear-triangular-fossa"], 0.24, 5), blob(SHAPES["ear-scapha"], 0.2, 4),
+  streak(C_HIN, 5, 0.3, 2.5), streak(AA_E, 6, 0.28, 3), streak(TI, 5, 0.3, 2.5),
+  streak(C_OUT, 14, 0.4, 4, LIGHT), streak(SHADING[2], 9, 0.4, 3.5, LIGHT), streak(SHADING[1], 8, 0.35, 3.5, LIGHT), blob(SHAPES["ear-tragus"], 0.3, 4, LIGHT),
+  blob(SHAPES["ear-lobule"], 0.25, 9, LIGHT),
+];
+
 function build(side) {
   const flip = side === LEFT;
   const place = (pts) => (flip ? rev(mirror(pts, CX)) : pts);
@@ -118,6 +126,7 @@ function build(side) {
         <rect x="0" y="0" width="300" height="380" rx="14" fill={C.skin} />
         <path d={pathD(ear)} fill={C.skinShade} />
         {regions.map((r) => r.base && <path key={r.id} d={r.d} fill={r.base} />)}
+        <Shade id={"ear-" + side.key} clip={[ear]} items={EAR_SHADING.map((it) => ({ ...it, pts: place(it.pts) }))} depth={6} />
       </g>
     );
   }

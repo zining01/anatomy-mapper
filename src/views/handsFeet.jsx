@@ -11,6 +11,7 @@
 import { spline, seg, chain, rev, mirror, pathD, frame } from "../geometry.js";
 import { C, RIGHT, LEFT, other, region } from "./common.js";
 import { line, point, placeOverlays } from "./overlay.js";
+import { Shade } from "./shading.jsx";
 
 const CX = 200;
 const VIEWBOX = "0 38 400 308";
@@ -173,12 +174,13 @@ function footRegions(dorsal) {
 // ---------------------------------------------------------------------------
 const sides = (pts) => [pts, mirror(pts, CX)];
 
-function Art({ parts, details, dorsal, leftSide }) {
+function Art({ parts, details, dorsal, leftSide, id }) {
   const all = parts.flatMap(sides);
   return (
     <g>
       {all.map((p, i) => <path key={"o" + i} d={pathD(p)} fill={C.line} stroke={C.line} strokeWidth="3" strokeLinejoin="round" />)}
       {all.map((p, i) => <path key={"f" + i} d={pathD(p)} fill={dorsal ? C.skin : "#f6e6d6"} />)}
+      <Shade id={id} clip={all} depth={4.5} edge={0.5} />
       <g pointerEvents="none" fill="none" stroke={C.lineSoft} strokeWidth="0.9" strokeLinecap="round">
         {details.flatMap(sides).map((p, i) => <path key={i} d={pathD(p, false)} />)}
       </g>
@@ -276,7 +278,7 @@ const FOOT_PLANTAR_ANATOMY = [
 
 const view = (key, label, short, dorsal, regions, artProps, nails, overlays, note) => ({
   key, label, short, viewBox: VIEWBOX, kind: "regions", regions, overlays, note,
-  Under: () => <Art {...artProps} dorsal={dorsal} leftSide={dorsal ? LEFT : RIGHT} />,
+  Under: () => <Art {...artProps} id={key} dorsal={dorsal} leftSide={dorsal ? LEFT : RIGHT} />,
   Over: nails ? () => <Nails digits={nails} /> : undefined,
 });
 

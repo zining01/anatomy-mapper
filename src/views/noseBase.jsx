@@ -6,6 +6,7 @@ import { spline, seg, chain, rev, mirror, midline, pathD, labelPointOnLine } fro
 import { C } from "./common.js";
 import { headRegion, headPair, RIGHT, LEFT } from "./catalog.js";
 import { line, placeOverlays } from "./overlay.js";
+import { Shade, ell, blob, streak, LIGHT } from "./shading.jsx";
 
 const CX = 150;
 const sp = (pts) => spline(pts, { steps: 12 });
@@ -61,7 +62,13 @@ function Under() {
     <g>
       <rect x="14" y="122" width="272" height="134" fill={C.skinShade} />
       <path d={pathD(NOSE)} fill={C.skin} stroke={C.line} strokeWidth="2" strokeLinejoin="round" />
-      {both(NOSTRIL).map((p, i) => <path key={i} d={pathD(p)} fill={C.nostril} />)}
+      <Shade id="nb-face" clip={[[[14, 122], [286, 122], [286, 256], [14, 256]]]} edge={0}
+        items={[streak(midline(chain(OUT, BASE, [CB, M_sn]), CX), 16, 0.4, 6), blob(ell(150, 236, 5, 12), 0.14, 3)]} />
+      <Shade id="nb-nose" clip={[NOSE]} depth={7} edge={0.6}
+        items={[...both(NOSTRIL).map((p) => streak([...p, p[0]], 7, 0.3, 3)), blob(ell(150, 58, 20, 12), 0.55, 6, LIGHT),
+          streak([[150, 124], [150, 204]], 6, 0.4, 3, LIGHT), ...both(ell(76, 176, 7, 20, 14)).map((p) => blob(p, 0.35, 5, LIGHT))]} />
+      {both(NOSTRIL).map((p, i) => <path key={i} d={pathD(p)} fill="#7d5744" />)}
+      <Shade id="nb-nostril" clip={both(NOSTRIL)} edge={0} items={both(ell(118, 170, 9, 34, 8)).map((p) => blob(p, 0.5, 6, "#3b2318"))} />
     </g>
   );
 }

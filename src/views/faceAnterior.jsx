@@ -8,6 +8,7 @@ import { spline, seg, chain, rev, mirror, midline, pathD, labelPointOnLine } fro
 import { C, LEFT } from "./common.js";
 import { headRegion, headPair, RIGHT } from "./catalog.js";
 import { line, zone, area, point, rstl, placeOverlays } from "./overlay.js";
+import { Shade, ell, blob, streak, strands, LIGHT } from "./shading.jsx";
 
 const CX = 150;
 const sp = (pts) => spline(pts, { steps: 14 });
@@ -241,11 +242,52 @@ const both = (pts) => [pts, mirror(pts, CX)];
 const EYE = chain(UMG, rev(LMG));
 const HEAD = midline(chain(OUT), CX);
 
+// --- Shading (decorative) ---------------------------------------------------------------------
+const ptsOf = (...ids) => regions.filter((r) => ids.includes(r.baseId)).map((r) => r.pts);
+const HAIR_CLIP = ptsOf("fa-frontal-scalp", "h-temporal-scalp");
+const BROW_CLIP = ptsOf("fa-eyebrow");
+const NECK_CLIP = ptsOf("fa-anterior-neck", "h-scm", "h-posterior-triangle");
+const FIGURE_CLIP = [HEAD, ...ptsOf("fa-ear"), ...NECK_CLIP];
+const sym = (items) => items.flatMap((it) => [it, { ...it, pts: mirror(it.pts, CX) }]);
+const FACE_SHADING = [
+  ...sym([
+    blob(ell(117, 157, 20, 11), 0.2, 5), blob(ell(117, 150.5, 15, 3.6), 0.18, 2.5), blob(ell(136.5, 161, 4, 7), 0.2, 2.5),
+    streak([[140, 160], [137.5, 180], [133.5, 200], [129, 213]], 7, 0.2, 3),
+    streak(AF, 3, 0.28, 1.5), streak(AG, 2, 0.2, 1.2), streak(FOUT, 3.5, 0.17, 2.2),
+    blob(ell(91, 217, 13, 23, 12), 0.17, 7), blob(ell(71, 138, 9, 25), 0.17, 6), blob(ell(124.5, 249.5, 3, 3), 0.25, 1.5),
+    blob(ell(106, 196, 12, 9), 0.4, 6, LIGHT), blob(ell(132.5, 214.5, 2.6, 3.2), 0.35, 1.5, LIGHT), blob(ell(117, 153.6, 9, 2), 0.3, 1.5, LIGHT),
+    blob(ell(104, 122, 12, 9), 0.25, 6, LIGHT),
+  ]),
+  blob(ell(150, 228.6, 13, 3.2), 0.3, 2), blob(ell(150, 232.5, 2.6, 5), 0.16, 1.5), blob(ell(150, 267, 15, 3.6), 0.3, 2.5),
+  streak(midline(MLN, CX), 3.5, 0.28, 1.4),
+  blob(ell(150, 110, 34, 16), 0.5, 9, LIGHT), streak([[150, 160], [150, 200]], 5, 0.5, 2.5, LIGHT), blob(ell(150, 209, 4.6, 3.6), 0.6, 2, LIGHT),
+  blob(ell(150, 285, 11, 7), 0.4, 5, LIGHT), blob(ell(150, 255.6, 10, 2.4), 0.45, 1.6, LIGHT),
+];
+const NECK_SHADING = [
+  streak(midline(seg(OUT, G1, MEN), CX), 30, 0.42, 7),
+  ...sym([streak(SCM, 4, 0.18, 2.5), streak(SCMP, 4, 0.15, 2.5), streak([[112, 300], [120, 335], [126, 372]], 9, 0.3, 4, LIGHT), streak([[143, 376], [118, 368], [86, 366]], 5, 0.3, 3, LIGHT)]),
+  blob(ell(150, 376, 9, 6), 0.3, 3), streak([[150, 312], [150, 362]], 16, 0.22, 7, LIGHT),
+];
+const HAIR_SHADING = [
+  ...strands([150, -70], 52, 128, 2.5, 190, 5).map((p) => streak(spline(p), 0.6, 0.45, 0.3, "#b79c80")),
+  ...sym([streak(HAIR, 9, 0.3, 3, "#a88a6c")]),
+  blob(ell(150, 50, 46, 9), 0.3, 8, LIGHT),
+];
+const browMid = [[138, 147], [127, 142.5], [119, 139.5], [106, 140], [96, 143.5], [90, 149]];
+const BROW_HAIRS = spline(browMid, { steps: 5 }).flatMap(([x, y], i) => {
+  const lean = 1.2 + (i / 26) * 2.4; // hairs lie flatter towards the tail
+  return [streak([[x + 1.4, y + 3.2], [x - lean, y - 3.2]], 0.55, 0.75, 0.2, "#8c6a52")];
+});
+
 function Under({ k = 1 }) {
   return (
     <g>
       <path d={pathD(HEAD)} fill={C.skin} stroke={C.line} strokeWidth={2.2 * k} />
       {regions.map((r) => r.base && <path key={r.id} d={r.d} fill={r.base} />)}
+      <Shade id="fa-neck" clip={NECK_CLIP} items={NECK_SHADING} edge={0} />
+      <Shade id="fa-hair" clip={HAIR_CLIP} items={HAIR_SHADING} edge={0} />
+      <Shade id="fa-brow" clip={BROW_CLIP} items={sym(BROW_HAIRS)} edge={0} />
+      <Shade id="fa-face" clip={FIGURE_CLIP} items={FACE_SHADING} depth={6} />
     </g>
   );
 }
@@ -266,8 +308,12 @@ function Over({ k = 1 }) {
             <path d={pathD(e)} fill="#fbf8f4" />
             <g clipPath={`url(#fa-eye-${i})`}>
               <circle cx={cx} cy="163" r="6.6" fill={C.iris} />
+              <circle cx={cx} cy="163" r="6.3" fill="none" stroke="#4d3c2f" strokeWidth="0.9" opacity="0.7" />
+              <circle cx={cx} cy="163.6" r="4.4" fill="#9a7f66" opacity="0.55" />
               <circle cx={cx} cy="163" r="2.7" fill={C.pupil} />
-              <circle cx={cx + 1.8} cy="161.3" r="1.1" fill="#fff" opacity="0.8" />
+              <circle cx={cx + 1.8} cy="161.3" r="1.1" fill="#fff" opacity="0.85" />
+              <ellipse cx={cx} cy="156.6" rx="17" ry="3.4" fill="#3b2e25" opacity="0.22" />
+              <circle cx={i ? 2 * CX - 133.4 : 133.4} cy="164.9" r="1.5" fill="#e3a79c" />
             </g>
           </g>
         );

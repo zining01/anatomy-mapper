@@ -6,6 +6,7 @@ import { C } from "./common.js";
 import { headRegion, RIGHT, LEFT } from "./catalog.js";
 import { EAR_GEOM } from "./ear.jsx";
 import { line, zone, area, point, rstl, placeOverlays } from "./overlay.js";
+import { Shade, ell, blob, streak, strands, LIGHT } from "./shading.jsx";
 
 const CX = 150;
 const sp = (pts) => spline(pts, { steps: 14 });
@@ -225,6 +226,25 @@ const ANATOMY = [
 // ---------------------------------------------------------------------------------------------------------
 const HEAD = chain(OUTL);
 const EYE = chain(UML, rev(LML));
+// Shading (decorative), authored for the right-facing head.
+const FACE_SHADING = [
+  blob(ell(231, 160, 13, 9), 0.2, 4), blob(ell(232, 152.5, 10, 3), 0.18, 2.5), blob(ell(203, 150, 12, 16), 0.13, 7),
+  blob(ell(204, 207, 22, 13, -20), 0.17, 8), streak(AC, 2.5, 0.3, 1.2), streak(AGR, 2, 0.2, 1), streak(FOUT, 3.2, 0.18, 2),
+  blob(ell(245, 258.5, 6, 3), 0.26, 2), blob(ell(253, 223, 4, 2.4), 0.25, 1.5), blob(ell(243.2, 240.6, 2.6, 2.6), 0.26, 1.4),
+  streak(seg(EAR_L, BACK_TOP, BACK_LOW), 7, 0.22, 3), blob(ell(132, 214, 9, 8), 0.16, 4),
+  blob(ell(236, 112, 10, 22), 0.45, 7, LIGHT), streak([[252, 168], [261, 189], [267.5, 202]], 3, 0.5, 2, LIGHT), blob(ell(268, 207.5, 3, 3.6), 0.55, 1.8, LIGHT),
+  blob(ell(224, 194, 12, 10), 0.4, 6, LIGHT), blob(ell(247, 278, 6, 7), 0.35, 4, LIGHT), blob(ell(251, 246.6, 3, 2), 0.42, 1.2, LIGHT),
+  streak([[170, 175], [196, 172.5], [214, 170]], 5, 0.25, 3, LIGHT), streak([[178, 262], [204, 276], [226, 283]], 5, 0.22, 3, LIGHT),
+];
+const NECK_SHADING = [
+  streak(MLB, 24, 0.36, 7), streak(SCMA, 4, 0.16, 3), streak(SCMP, 4, 0.14, 3), streak(TZ, 5, 0.14, 3.5),
+  streak([[146, 224], [152, 270], [160, 320], [167, 376]], 13, 0.3, 6, LIGHT), streak([[98, 290], [112, 330], [122, 372]], 12, 0.2, 7, LIGHT),
+];
+const HAIR_SHADING = [
+  ...strands([262, -10], 96, 176, 3, 330, -26).map((p) => streak(spline(p), 0.6, 0.45, 0.3, "#b79c80")),
+  streak(HLN, 9, 0.3, 3, "#a88a6c"), streak(HBH, 8, 0.25, 3, "#a88a6c"), blob(ell(140, 62, 60, 12, -8), 0.3, 9, LIGHT),
+];
+
 const ZOOMS = [
   { label: "Temple & cheek", box: [140, 96, 116, 116] },
   { label: "Eye", box: [194, 126, 68, 62] },
@@ -251,11 +271,16 @@ function build(side) {
     sp([[112, 78], [104, 100], [98, 128]]),
   ].map(place);
 
+  const ptsOf = (...ids) => regions.filter((r) => ids.includes(r.baseId)).map((r) => r.pts);
+  const sid = `hl-${side.key}`;
   function Under({ k = 1 }) {
     return (
       <g>
         <path d={pathD(place(HEAD))} fill={C.skin} stroke={C.line} strokeWidth={2 * k} strokeLinejoin="round" />
         {regions.map((r) => r.base && <path key={r.id} d={r.d} fill={r.base} />)}
+        <Shade id={sid + "-neck"} clip={ptsOf("fa-anterior-neck", "h-submandibular", "h-submental", "h-scm", "h-posterior-triangle", "h-posterolateral-neck")} items={NECK_SHADING.map((it) => ({ ...it, pts: place(it.pts) }))} edge={0} />
+        <Shade id={sid + "-hair"} clip={ptsOf("fa-frontal-scalp", "h-parietal-scalp", "h-temporal-scalp", "h-occipital-scalp")} items={HAIR_SHADING.map((it) => ({ ...it, pts: place(it.pts) }))} edge={0} />
+        <Shade id={sid + "-face"} clip={[place(HEAD)]} items={FACE_SHADING.map((it) => ({ ...it, pts: place(it.pts) }))} depth={7} />
       </g>
     );
   }

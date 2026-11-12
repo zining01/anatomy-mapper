@@ -45,6 +45,12 @@ detailed ear.
 * **Zoom** presets (eyes, nose, lips, temple, neck on the head views; trunk,
   arms, thighs, legs on the body views) make small subunits and crowded
   limbs easy to read.
+* **Glossary:** terms a junior trainee may not know (flap names, fascial
+  planes, eponyms, eyelid and nail vocabulary) are underlined in the notes;
+  clicking one opens a short built-in definition with a link to search the
+  open-access NCBI Bookshelf (StatPearls). The whole glossary can be browsed
+  from the reference card and searched from the search box. Definitions live
+  in `src/reference/glossary.js`.
 * Deep links: `index.html#view=headRight&layers=danger,motor&zoom=1&focus=fa-temple-r`.
 
 The reference text is a memory aid for trained clinicians: nerve and vessel
@@ -72,12 +78,14 @@ src/
   InfoPanel.jsx         the "Surgical reference" card
   reference/
     structures.js       text for every nerve, vessel, duct and danger zone
+    glossary.js         definitions of terms, linked automatically wherever they appear in the notes
     regions.js          per-region notes: AUC area, structures at risk, plane, supply, lymphatics, repair
   geometry.js           spline / region-building helpers shared by all drawings
   views/
     index.js            which views exist and how the buttons are grouped
     common.js           colours, subunit groups (legend), overlay layers, left/right naming
     overlay.js          helpers for drawing nerves, vessels and danger zones
+    shading.jsx         soft shadows, highlights and hair strands used by the drawings
     catalog.js          names + search aliases for every head & neck region
     faceAnterior.jsx    face, anterior
     headLateral.jsx     head, right lateral (left lateral is its mirror)

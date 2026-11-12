@@ -8,6 +8,7 @@
 // down the limb, so landmarks such as "lateral epicondyle" are easy to place.
 import { spline, chain, rev, mirror, pathD, frame } from "../geometry.js";
 import { C } from "./common.js";
+import { Shade, ell, blob, streak, LIGHT } from "./shading.jsx";
 
 export const CX = 200;
 export const VIEWBOX = "0 0 400 710";
@@ -159,10 +160,35 @@ export function Silhouette({ posterior, fill = C.skin, k = 1 }) {
   );
 }
 
+const symB = (items) => items.flatMap((it) => [it, { ...it, pts: flipX(it.pts) }]);
+const ANTERIOR_SHADING = [
+  blob(ell(200, 106, 17, 6), 0.32, 3),
+  ...symB([
+    streak(sp([[200, 202], [188, 204], [172, 202], [158, 192], [150, 180]]), 6, 0.2, 3), streak(sp([[196, 134], [176, 135], [152, 138], [130, 147]]), 4, 0.16, 2.5),
+    streak(sp([[146, 322], [166, 342], [186, 360], [194, 368]]), 5, 0.16, 3), streak(sp([[200, 224], [184, 236], [166, 256], [156, 268]]), 5, 0.12, 3),
+    blob(ell(176, 178, 17, 12, -12), 0.3, 6, LIGHT), blob(ell(188, 262, 9, 34), 0.2, 6, LIGHT), streak(arm([[-13, 8], [-17, 30], [-15, 52]]), 10, 0.3, 5, LIGHT),
+    streak(arm([[-4, 70], [-5, 112]]), 9, 0.22, 5, LIGHT), streak(arm([[-6, 156], [-4, 215]]), 8, 0.22, 4.5, LIGHT),
+    streak(leg([[-10, 20], [-8, 70], [-4, 120]]), 16, 0.28, 8, LIGHT), streak(leg([[-3, 176], [-1, 262]]), 7, 0.28, 4, LIGHT), blob(leg(ell(0, 148, 8, 11)), 0.3, 4, LIGHT),
+    streak(leg([[8, 168], [10, 220], [6, 262]]), 6, 0.14, 4),
+  ]),
+  streak([[200, 206], [200, 330]], 5, 0.14, 3), blob(ell(200, 56, 13, 17), 0.3, 6, LIGHT),
+];
+const POSTERIOR_SHADING = [
+  streak([[200, 112], [200, 346]], 6, 0.2, 3), streak([[200, 350], [200, 404]], 5, 0.3, 2.5),
+  ...symB([
+    streak(sp([[198, 405], [182, 410], [162, 408], [148, 400]]), 7, 0.26, 3.5), streak(sp([[182, 156], [180, 186], [176, 212], [170, 224]]), 5, 0.14, 3),
+    streak(sp([[182, 104], [180, 120], [166, 131], [140, 142]]), 5, 0.12, 3),
+    blob(ell(186, 236, 8, 62), 0.24, 7, LIGHT), blob(ell(166, 184, 14, 22, 12), 0.22, 7, LIGHT), blob(ell(170, 376, 19, 18), 0.32, 7, LIGHT),
+    streak(arm([[-12, 8], [-16, 32], [-13, 56]]), 10, 0.28, 5, LIGHT), streak(arm([[0, 70], [0, 118]]), 10, 0.22, 5, LIGHT), streak(arm([[-3, 156], [-1, 215]]), 8, 0.2, 4.5, LIGHT),
+    streak(leg([[-6, 30], [-4, 110]]), 17, 0.26, 8, LIGHT), streak(leg([[-1, 178], [0, 232]]), 13, 0.3, 6, LIGHT), streak(leg([[0, 152], [0, 164]]), 14, 0.16, 4),
+  ]),
+];
+
 export function BodyArt({ posterior, k = 1 }) {
   return (
     <g>
       <Silhouette posterior={posterior} k={k} />
+      <Shade id={posterior ? "bp" : "ba"} clip={parts(posterior)} items={posterior ? POSTERIOR_SHADING : ANTERIOR_SHADING} depth={5} edge={0.5} />
       <Details posterior={posterior} />
     </g>
   );

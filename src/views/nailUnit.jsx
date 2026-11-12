@@ -3,6 +3,7 @@
 // highlights it in both. Reference notes live in reference/regions.js.
 import { spline, pathD } from "../geometry.js";
 import { C, region } from "./common.js";
+import { Shade, streak, LIGHT } from "./shading.jsx";
 
 const sp = (pts, closed = false) => spline(pts, { closed, steps: 8 });
 const rect = (x0, y0, x1, y1) => [[x0, y0], [x1, y0], [x1, y1], [x0, y1]];
@@ -90,6 +91,8 @@ function Under() {
       <path d={pathD(SECTION.find(([id]) => id === "nu-extensor")[1])} fill="#e9dcc0" />
       <path d={pathD(sp([[206, 193], [232, 192], [252, 188], [266, 181]]), false)} fill="none" stroke="#e9dcc0" strokeWidth="5" strokeLinecap="round" />
       <path d={pathD(SECTION.find(([id]) => id === "nu-plate")[1])} fill="#fbf6ee" />
+      <Shade id="nu" clip={[FINGER, SECTION_SKIN]} depth={5} edge={0.5}
+        items={[streak([[62, 96], [60, 126], [60, 146]], 5, 0.5, 2.5, LIGHT), streak([[66, 172], [66, 280]], 12, 0.3, 6, LIGHT)]} />
     </g>
   );
 }
